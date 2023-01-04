@@ -5174,20 +5174,6 @@ BOOL compile_load_variable(unsigned int node, sCompileInfo* info)
             
             info->type = clone_node_type(var_type2);
         }
-        else if(var_type2->mPointerNum > 0) {
-            LLVMTypeRef llvm_type = create_llvm_type_from_node_type(var_type2);
-            llvm_value.value = LLVMBuildLoad2(gBuilder, llvm_type, var_address, var_name);
-            llvm_value.constant = FALSE;
-            llvm_value.constant_str = FALSE;
-    
-            llvm_value.type = var_type2;
-            llvm_value.address = var_address;
-            llvm_value.var = var_;
-    
-            push_value_to_stack_ptr(&llvm_value, info);
-            
-            info->type = clone_node_type(var_type2);
-        }
         else if(var_type->mConstant && LLVMIsConstant(var_address) != 0) 
         {
             llvm_value.value = var_address;
@@ -5201,6 +5187,21 @@ BOOL compile_load_variable(unsigned int node, sCompileInfo* info)
             push_value_to_stack_ptr(&llvm_value, info);
             
             info->type = clone_node_type(var_type);
+        }
+        else if(var_type2->mPointerNum > 0) {
+            LLVMTypeRef llvm_type = create_llvm_type_from_node_type(var_type2);
+            
+            llvm_value.value = LLVMBuildLoad2(gBuilder, llvm_type, var_address, var_name);
+            llvm_value.constant = FALSE;
+            llvm_value.constant_str = FALSE;
+    
+            llvm_value.type = var_type2;
+            llvm_value.address = var_address;
+            llvm_value.var = var_;
+    
+            push_value_to_stack_ptr(&llvm_value, info);
+            
+            info->type = clone_node_type(var_type2);
         }
         else {
             LLVMTypeRef llvm_type = create_llvm_type_from_node_type(var_type2);
